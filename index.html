@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Daily Accountability App</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 1rem; background: #f5f7fa; }
+    h1 { text-align: center; color: #2c3e50; }
+    label { display: block; margin-top: 1rem; font-weight: bold; }
+    input, textarea { width: 100%; padding: 0.5rem; margin-top: 0.3rem; border-radius: 4px; border: 1px solid #ccc; }
+    button { margin-top: 1.5rem; width: 100%; padding: 0.8rem; font-size: 1.1rem; background-color: #3498db; border: none; border-radius: 5px; color: white; cursor: pointer; }
+    button:hover { background-color: #2980b9; }
+    .message { margin-top: 1rem; font-style: italic; color: #34495e; }
+  </style>
+</head>
+<body>
+  <h1>Daily Accountability</h1>
+
+  <form id="accountability-form">
+    <label for="morningPromise">☀️ Morning Promise</label>
+    <input type="text" id="morningPromise" name="morningPromise" placeholder="I will be patient with myself today" required />
+
+    <label for="habitNotes">📋 Habit & Progress Notes</label>
+    <textarea id="habitNotes" name="habitNotes" rows="4" placeholder="Write down your thoughts or wins here..."></textarea>
+
+    <label for="nightReflection">🌙 Night Reflection</label>
+    <textarea id="nightReflection" name="nightReflection" rows="4" placeholder="Be honest with yourself tonight..."></textarea>
+
+    <button type="submit">Save Today's Reflections</button>
+  </form>
+
+  <p class="message" id="futureSelfMessage">📬 Message from your Future Self: You are becoming stronger each day. Keep showing up.</p>
+
+  <script>
+    const form = document.getElementById('accountability-form');
+    const futureSelfMessage = document.getElementById('futureSelfMessage');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const morningPromise = form.morningPromise.value.trim();
+      const habitNotes = form.habitNotes.value.trim();
+      const nightReflection = form.nightReflection.value.trim();
+
+      // Save to localStorage (simple persistence)
+      const today = new Date().toISOString().slice(0,10);
+      localStorage.setItem(today + '-morningPromise', morningPromise);
+      localStorage.setItem(today + '-habitNotes', habitNotes);
+      localStorage.setItem(today + '-nightReflection', nightReflection);
+
+      alert("Reflections saved. Keep growing!");
+      form.reset();
+    });
+
+    // Simple notification reminders every 2 hours between 8 AM and 10 PM
+    function requestNotificationPermission() {
+      if ('Notification' in window) {
+        if (Notification.permission === 'default') {
+          Notification.requestPermission();
+        }
+      }
+    }
+
+    function showReminderNotification() {
+      if (Notification.permission === 'granted') {
+        new Notification("Daily Accountability Reminder", {
+          body: "Take a moment to check in with your morning promise or night reflection.",
+          icon: "https://cdn-icons-png.flaticon.com/512/2917/2917990.png"
+        });
+      }
+    }
+
+    function scheduleNotifications() {
+      const now = new Date();
+      const hour = now.getHours();
+      if (hour >= 8 && hour <= 22) {
+        showReminderNotification();
+      }
+    }
+
+    // Check every 2 hours (7200000 ms)
+    setInterval(scheduleNotifications, 7200000);
+
+    // Initial permission request on page load
+    requestNotificationPermission();
+  </script>
+</body>
+</html>
